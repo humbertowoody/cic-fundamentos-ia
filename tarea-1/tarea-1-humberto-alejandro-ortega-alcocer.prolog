@@ -4,14 +4,14 @@
 % Tarea 1 - Arbol Genealógico.
 %           Construir un programa Prolog para representar las relaciones de parentesco en 
 %           la familia Simpson. Programar las reglas para las opciones de: medios hermanos,
-%           tios, primos, cuñados y ancestros en general.
+%           tíos, primos, cuñados y ancestros en general.
 %
 % La imagen de referencia del árbol genealógico de la familia Simpson utilizado:
 % https://simpsons.fandom.com/wiki/Simpson_family?file=Simpsons_possible_family_tree.jpg
 %
 % Algunas propuestas de ejecución:
 %
-%  - padre_de(X,Y).            ~ Todas las realaciones de padres.
+%  - padre_de(X,Y).            ~ Todas las relaciones de padres.
 %  - madre_de(X,Y).            ~ Todas las relaciones de madres.
 %  - abuelo_de(X,Y).           ~ Todas las relaciones de abuelos.
 %  - abuela_de(X,Y).           ~ Todas las relaciones de abuelas.
@@ -19,8 +19,8 @@
 %  - hermana_de(X,Y).          ~ Todas las relaciones de hermanas.
 %  - medio_hermano_de(X,Y).    ~ Todas las relaciones de medios hermanos.
 %  - media_hermana_de(X,Y).    ~ Todas las relaciones de medias hermanas.
-%  - tio_de(X,Y).              ~ Todas las relaciones de tío.
-%  - tia_de(X,Y).              ~ Todas las relaciones de tía.
+%  - tío_de(X,Y).              ~ Todas las relaciones de tío.
+%  - tía_de(X,Y).              ~ Todas las relaciones de tía.
 %  - primo_de(X,Y).            ~ Todas las relaciones de primos.
 %  - prima_de(X,Y).            ~ Todas las relaciones de primas.
 %  - cuñado_de(X,Y).           ~ Todas las relaciones de cuñados.
@@ -234,30 +234,30 @@ media_hermana_de(X, MediaHermana):-
     mujer(MediaHermana).
 
 %========================================================================================
-% tio_de/2
-% tio_de(+Personaje, -Tio)
+% tío_de/2
+% tío_de(+Personaje, -Tío)
 %
 % Recibe como parámetro el nombre de algún personaje conocido y devuelve el nombre 
 % de todos los tíos hombres.
 % 
 % Definición de relación genealógica: el tío es el hermano de algún progenitor.
 %========================================================================================
-tio_de(X, Tio):-
+tío_de(X, Tío):-
     desciende(A,X),
-    hermano_de(A,Tio).
+    hermano_de(A,Tío).
 
 %========================================================================================
-% tia_de/2
-% tia_de(+Personaje, -Tia)
+% tía_de/2
+% tía_de(+Personaje, -Tía)
 %
 % Recibe como parámetro el nombre de algún personaje conocido y devuelve el nombre 
 % de todas las tías mujeres.
 % 
 % Definición de relación genealógica: la tía es la hermana de algún progenitor.
 %========================================================================================
-tia_de(X, Tia):-
+tía_de(X, Tía):-
     desciende(A,X),
-    hermana_de(A,Tia).
+    hermana_de(A,Tía).
 
 %========================================================================================
 % primo_de/2
@@ -269,10 +269,10 @@ tia_de(X, Tia):-
 % Definición de relación genealógica: el primo es el hijo de algún tío o tía.
 %========================================================================================
 primo_de(X, Primo):-
-    ((tia_de(X, Tia),
-    madre_de(Primo, Tia));
-    (tio_de(X, Tio),
-    padre_de(Primo, Tio))),
+    ((tía_de(X, Tía),
+    madre_de(Primo, Tía));
+    (tío_de(X, Tío),
+    padre_de(Primo, Tío))),
     hombre(Primo).
 
 %========================================================================================
@@ -285,10 +285,10 @@ primo_de(X, Primo):-
 % Definición de relación genealógica: la prima es la hija de algún tío o tía.
 %========================================================================================
 prima_de(X, Prima):-
-    ((tia_de(X, Tia),
-    madre_de(Prima, Tia));
-    (tio_de(X, Tio),
-    padre_de(Prima, Tio))),
+    ((tía_de(X, Tía),
+    madre_de(Prima, Tía));
+    (tío_de(X, Tío),
+    padre_de(Prima, Tío))),
     mujer(Prima).
 
 %========================================================================================
