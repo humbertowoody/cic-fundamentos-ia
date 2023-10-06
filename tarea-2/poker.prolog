@@ -1,17 +1,41 @@
-%=======
-% Tarea 2 - Humberto Alejandro Ortega Alcocoer - 2016630495
-%====
+% =============================================================================
+% Humberto Alejandro Ortega Alcocer, ESCOM, 2016630495.
+% 
+% Tarea 2 - Figuras del Póker.
+%           Construir un programa en Prolog que genere un mazo de cartas,
+%           reparta 5 cartas a 4 jugadores, evalúe las manos y muestre los
+%           resultados.
+% 
+% Fundamentos de Inteligencia Artificial, CIC, IPN, 2023.
+% =============================================================================
 
+
+% =============================================================================
+% Hechos 
+% =============================================================================
+
+% Lista con los palos disponibles, en el orden de prioridad de la baraja.
+lista_palos(['♠️','♥️','♣️','♦️']).
+
+% Lista con los personajes disponibles, en el orden de prioridad de la baraja.
+lista_personajes(['A','K','Q','J']).
+
+% Casino más cercano al CIC para validar esta tarea.
+casino_más_cercano_al_cic('Yak Lindavista').
+
+% =============================================================================
+% Predicados
+% =============================================================================
 
 % palo/1
 % palo(-Palo)
 % Palo es un palo de la baraja
-palo(P):- member(P, ['♠️','♥️','♣️','♦️']).
+palo(P):- lista_palos(L),member(P, L).
 
 % personaje/1
 % personaje(-Personaje)
 % Personaje es un personaje de la baraja
-personaje(P):- member(P, ['A','J','Q','K']).
+personaje(P):- lista_personajes(L),member(P, L).
 
 % valor/1
 % valor(-Valor)
@@ -62,9 +86,11 @@ mazo(Mazo):-
   baraja(A),
   baraja(B),
   append(A,B, MazoOrdenado),
-  findall(C, comodín(C), Comodines),
-  append(Comodines, MazoOrdenado, MazoOrdenadoConComodines),
-  barajar(MazoOrdenadoConComodines, Mazo).
+  % comodines!
+  % findall(C, comodín(C), Comodines),
+  % append(Comodines, MazoOrdenado, MazoOrdenadoConComodines),
+  % barajar(MazoOrdenadoConComodines, Mazo).
+  barajar(MazoOrdenado, Mazo).
 
 % generar_manos_jugadores/4
 % generar_manos_jugadores(+NumeroJugadores, +CartasPorJugador, +Mazo, -Manos)
@@ -93,7 +119,7 @@ reparte_cartas():-
   format('Generando mazo inicial...~n'),
   mazo(M),
   format('Generando mano de cada jugador...~n'),
-  generar_manos_jugadores(4, 5, M, Manos),
+  generar_manos_jugadores(20, 5, M, Manos),
   format('Manos generadas:~n'),
   imprimir_lista_de_listas(Manos),
   format('Evaluando manos...~n'),
@@ -115,92 +141,160 @@ imprimir_lista_de_listas([Lista|Resto]) :-
 % mismo_palo/1
 % mismo_palo(+Mano)
 % Mano es una lista de cartas del mismo palo
-mismo_palo([Carta | Resto]):-
-  Carta = _-Palo,
-  maplist(=(Palo), Resto).
-
-% tienen_dos_cartas_de_mismo_valor/1 
-% tienen_dos_cartas_de_mismo_valor(+Mano) 
-% Mano es una lista de cartas que contiene dos cartas de mismo valor
-tiene_dos_cartas_de_mismo_valor([Carta | Resto]):-
-  Carta = Valor-_,
-  member(Carta, Resto).
-tienen_tres_cartas_de_mismo_valor([_| Resto]):-
-  tiene_dos_cartas_de_mismo_valor(Resto).
+mismo_palo(Mano):-
+  Mano = [_-Palo, _-Palo, _-Palo, _-Palo, _-Palo].
 
 % figura_maxima/2
 % figura_maxima(+Mano, -Figura)
 % Figura es la figura máxima de la Mano
 figura_maxima(Mano, "Flor Imperial"):-
-  mismo_palo(Mano),
-  !.
+  figura_flor_imperial(Mano).
 figura_maxima(Mano, "Flor"):-
-  mismo_palo(Mano), !.
+  figura_flor(Mano).
 figura_maxima(Mano, "Poker"):-
-  Mano = [Carta1, Carta2, Carta3, Carta4, Carta5],
-  Carta1 = _-Palo,
-  Carta2 = _-Palo, !.
+  figura_poker(Mano).
 figura_maxima(Mano, "Full"):-
-  Mano = [Carta1, Carta2, Carta3, Carta4, Carta5],
-  Carta1 = Valor1-_,
-  Carta2 = Valor2-_,
-  Carta3 = Valor3-_,
-  Carta4 = Valor4-_,
-  Carta5 = Valor5-_,
-  (Valor1 = Valor2; Valor1 = Valor3; Valor1 = Valor4; Valor1 = Valor5),
-  (Valor2 = Valor3; Valor2 = Valor4; Valor2 = Valor5),
-  (Valor3 = Valor4; Valor3 = Valor5),
-  !.
+  figura_full(Mano).
 figura_maxima(Mano, "Color"):-
-  mismo_palo(Mano), !.
+  figura_color(Mano).
 figura_maxima(Mano, "Escalera"):-
-  Mano = [Carta1, Carta2, Carta3, Carta4, Carta5],
-  Carta1 = Valor1-_,
-  Carta2 = Valor2-_,
-  Carta3 = Valor3-_,
-  Carta4 = Valor4-_,
-  Carta5 = Valor5-_,
-  Valor1 = Valor2 - 1,
-  Valor2 = Valor3 - 1,
-  Valor3 = Valor4 - 1,
-  Valor4 = Valor5 - 1,
-  !.
-figura_maxima(Mano, "Trio"):-
-  Mano = [Carta1, Carta2, Carta3, Carta4, Carta5],
-  Carta1 = Valor1-_,
-  Carta2 = Valor2-_,
-  Carta3 = Valor3-_,
-  Carta4 = Valor4-_,
-  Carta5 = Valor5-_,
-  (Valor1 = Valor2; Valor1 = Valor3; Valor1 = Valor4; Valor1 = Valor5),
-  (Valor2 = Valor3; Valor2 = Valor4; Valor2 = Valor5),
-  (Valor3 = Valor4; Valor3 = Valor5),
-  !.
+  figura_escalera(Mano). 
+figura_maxima(Mano, "Tercia"):-
+  figura_tercia(Mano).
 figura_maxima(Mano, "Doble Par"):-
-  Mano = [Carta1, Carta2, Carta3, Carta4, Carta5],
-  Carta1 = Valor1-_,
-  Carta2 = Valor2-_,
-  Carta3 = Valor3-_,
-  Carta4 = Valor4-_,
-  Carta5 = Valor5-_,
-  (Valor1 = Valor2; Valor1 = Valor3; Valor1 = Valor4; Valor1 = Valor5),
-  (Valor2 = Valor3; Valor2 = Valor4; Valor2 = Valor5),
-  (Valor3 = Valor4; Valor3 = Valor5),
-  !.
-% Par 
-% Un par es una mano de 5 cartas en la que dos de ellas tienen el mismo valor.
+  figura_doble_par(Mano).
 figura_maxima(Mano, "Par"):-
-  tiene_dos_cartas_de_mismo_valor(Mano);
-  (comodín(C), member(C, Mano)),
-  !.
-% Predicado por defecto, el motor de inferencia llegará a este punto (por el corte)
-% si no se cumple ninguna de las condiciones anteriores.
-figura_maxima(_, "Nada").
+  figura_par(Mano).
+figura_maxima(_, "Nada"):- % Si no es ninguna de las anteriores, entonces es Nada.
+  format('Nada~n', []).
 
 % imprimir_resultados/2
 % imprimir_resultados(+Manos, +Figuras)
 % Imprime los resultados de las manos.
 imprimir_resultados([], []).
 imprimir_resultados([Mano | RestoM], [Figura | RestoF]):-
-  format('~|~w~5+ ~|~w~9+ ~|~w~13+ ~w~n', ["ñ", "Jugador-1", Figura, Mano]),
+  length(RestoM, L),
+  Posicion is 4 - L,
+  format('~|~w~5+~| ~|~w~9+ ~|~w~13+ ~w~n', [Posicion, "Jugador-1", Figura, Mano]),
   imprimir_resultados(RestoM, RestoF).
+
+
+% figura_par/1 
+% figura_par(+Mano) 
+% Mano es una lista de cartas que contiene un par
+figura_par(Mano):-
+  member(V-_, Mano), select(V-_, Mano, Resto), 
+  member(V2-_, Resto), V == V2, 
+  member(V3-_, Resto), member(V4-_, Resto), member(V5-_, Resto),
+  V3 \== V4, V3 \== V5, V4 \== V5,
+  V3 \== V, V4 \== V, V5 \== V,
+  format('Par de ~w~n', [V]),
+  !.
+
+% figura_tercia/1 
+% figura_tercia(+Mano) 
+% Mano es una lista de cartas que contiene una tercia
+figura_tercia(Mano):-
+  member(V-_, Mano), select(V-_, Mano, Resto),
+  member(V2-_, Resto), V2 == V, select(V2-_, Resto, Resto2),
+  member(V3-_, Resto2), V3 == V, 
+  member(V4-_, Resto2), member(V5-_, Resto2),
+  V4 \== V5, V4 \== V, V5 \== V,
+  format('Tercia de ~w~n', [V]),
+  !.
+
+% figura_doble_par/1 
+% figura_doble_par(+Mano)
+% Mano es una lista de cartas que contiene un doble par
+figura_doble_par(Mano):-
+  member(V-_, Mano), select(V-_, Mano, Resto),
+  member(V2-_, Resto), V2 == V, select(V2-_, Resto, Resto2),
+  member(V3-_, Resto2), select(V3-_, Resto2, Resto3),
+  member(V4-_, Resto3), V4 == V3, select(V4-_, Resto3, Resto4),
+  member(V5-_, Resto4), 
+  V5 \== V, V5 \== V3, 
+  V \== V3, 
+  format('Doble par de ~w y ~w~n', [V, V3]),
+  !.
+
+% figura_escalera/1 
+% figura_escalera(+Mano)
+% Mano es una lista de cartas que contiene una escalera
+figura_escalera(Mano):-
+  Mano = [Carta1, Carta2, Carta3, Carta4, Carta5],
+  carta_consecutiva_a(Carta1, Carta2),
+  carta_consecutiva_a(Carta2, Carta3),
+  carta_consecutiva_a(Carta3, Carta4),
+  carta_consecutiva_a(Carta4, Carta5),
+  format('Escalera~n', []),
+  !.
+
+% figura_color/1 
+% figura_color(+Mano) 
+% Mano es una lista de cartas que contiene un color
+figura_color(Mano):-
+  mismo_palo(Mano),
+  format('Color~n', []),
+  !.
+
+% figura_full/1
+% figura_full(+Mano)
+% Mano es una lista de cartas que contiene un full
+figura_full(Mano):-
+  figura_tercia(Mano),
+  figura_par(Mano),
+  format('Full~n', []),
+  !.
+
+% figura_poker/1 
+% figura_poker(+Mano) 
+% Mano es una lista de cartas que contiene un poker
+figura_poker(Mano):-
+  Mano = [Carta1, Carta2, Carta3, Carta4, Carta5],
+  Carta1 = V-_, Carta2 = V-_, Carta3 = V-_, Carta4 = V-_, Carta5 = V-_,
+  format('Poker de ~w~n', [V]),
+  !.
+
+% figura_flor/1 
+% figura_flor(+Mano) 
+% Mano es una lista de cartas que contiene una flor
+figura_flor(Mano):-
+  mismo_palo(Mano),
+  figura_escalera(Mano),
+  format('Flor~n', []),
+  !.
+
+% figura_flor_imperial/1 
+% figura_flor_imperial(+Mano) 
+% Mano es una lista de cartas que contiene una flor imperial
+figura_flor_imperial(Mano):-
+  mismo_palo(Mano),
+  figura_escalera(Mano),
+  Mano = [Carta1 | _],
+  Carta1 = V-_, 
+  V == 10,
+  format('Flor Imperial~n', []),
+  !.
+
+% carta_consecutiva_a/2
+% carta_consecutiva_a(+Carta1, +Carta2)
+% Carta1 es consecutiva a Carta2 si su valor es consecutivo.
+carta_consecutiva_a(Carta1, Carta2):- % Este es el caso dónde ambas cartas son números.
+  Carta1 = V1-_, Carta2 = V2-_,
+  integer(V1), integer(V2),
+  V1 > V2,
+  V1 is V2 + 1.
+carta_consecutiva_a(Carta1, Carta2):- % Este es el caso dónde Carta1 es un personaje y Carta2 es un numero.
+  Carta1 = V1-_, Carta2 = V2-_,
+  personaje(V1), integer(V2),
+  V1 == 'J',
+  V2 == 10.
+carta_consecutiva_a(Carta1, Carta2):- % Este es el caso dónde ambas cartas son personajes.
+  Carta1 = V1-_, Carta2 = V2-_,
+  personaje(V1), personaje(V2),
+  lista_personajes(L),
+  nth0(Indice1, L, V1),
+  nth0(Indice2, L, V2),
+  Indice1 > Indice2,
+  Indice1 is Indice2 + 1.
+
