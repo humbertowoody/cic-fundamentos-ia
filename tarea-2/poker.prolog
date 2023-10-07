@@ -5,6 +5,13 @@
 %           Construir un programa en Prolog que genere un mazo de cartas,
 %           reparta 5 cartas a 4 jugadores, evalúe las manos y muestre los
 %           resultados.
+%
+% Propuesta de Ejecución:
+%   1. Ejecutar el predicado reparte_cartas/0.
+%   2. El programa generará un mazo de cartas, repartirá 5 cartas a 4 jugadores,
+%      evaluará las manos y mostrará los resultados.
+%   3. El programa terminará, si se desea jugar otra partida, ejecutar el predicado
+%      reparte_cartas/0 nuevamente.
 % 
 % Fundamentos de Inteligencia Artificial, CIC, IPN, 2023.
 % =============================================================================
@@ -20,8 +27,17 @@ lista_palos(['♠️','♥️','♣️','♦️']).
 % Lista con los personajes disponibles, en el orden de prioridad de la baraja.
 lista_personajes(['A','K','Q','J']).
 
-% Casino más cercano al CIC para validar esta tarea.
-casino_más_cercano_al_cic('Yak Lindavista').
+% Los valores numéricos asociados a cada figura (puntaje) para la evaluación final.
+valor_figura("Nada", 1).
+valor_figura("Par", 2).
+valor_figura("Doble Par", 3).
+valor_figura("Tercia", 4).
+valor_figura("Escalera", 5).
+valor_figura("Color", 6).
+valor_figura("Full", 7).
+valor_figura("Poker", 8).
+valor_figura("Flor", 9).
+valor_figura("Flor Imperial", 10).
 
 % =============================================================================
 % Predicados
@@ -61,26 +77,6 @@ carta_valor(Valor-Palo):-
   valor(Valor),
   palo(Palo).
 
-% Estas listas son para hacer pruebas.
-lista_cartas_prueba([10-'♦️', 'J'-'♦️', 'Q'-'♦️', 'K'-'♦️','A'-'♦️']). % Flor Imperial
-%lista_cartas_prueba([7-'♥️', 8-'♥️', 9-'♥️', 10-'♥️', 'J'-'♥️']). % Flor
-%lista_cartas_prueba(['A'-'♠️', 'A'-'♥️', 'A'-'♣️', 'A'-'♦️', 'K'-'♠️']). % Poker de A
-%lista_cartas_prueba(['A'-'♠️', 'A'-'♥️', 'A'-'♣️', 2-'♦️', 2-'♠️']). % Full
-%lista_cartas_prueba(['A'-'♠️', 'A'-'♠️', 2-'♠️', 3-'♠️', 'K'-'♠️']). % Color
-%lista_cartas_prueba([3-'♠️', 4-'♥️', 5-'♣️', 6-'♦️', 7-'♠️']). % Escalera
-%lista_cartas_prueba(['A'-'♠️', 'A'-'♥️', 'A'-'♣️', 2-'♦️', 'K'-'♠️']). % Tercia de A
-%lista_cartas_prueba(['A'-'♠️', 'A'-'♥️', 2-'♣️', 2-'♦️', 'K'-'♠️']). % Doble par de A y 2
-%lista_cartas_prueba(['A'-'♠️', 'A'-'♥️', 2-'♣️', 3-'♦️', 4-'♠️']). % Par de A
-
-prueba():-
-  lista_cartas_prueba(L),
-  random_permutation(L, L2),
-  format('Lista de cartas de prueba: ~w~n', [L]),
-  figura_maxima(L, _),
-  format('Lista de cartas de prueba barajada: ~w~n', [L2]),
-  figura_maxima(L2, _),
-  !.
-
 % baraja/1
 % baraja(-Baraja)
 % Baraja es una lista con todas las cartas de la baraja (sin comodines).
@@ -106,7 +102,8 @@ mazo(Mazo):-
   baraja(A),
   baraja(B),
   append(A,B, MazoOrdenado),
-  % comodines!
+  % Esta parte es para agregar los comodines al mazo, pero no se agregan porque
+  % no pude hacer que las figuras se evaluaran correctamente con los comodines.
   % findall(C, comodín(C), Comodines),
   % append(Comodines, MazoOrdenado, MazoOrdenadoConComodines),
   % barajar(MazoOrdenadoConComodines, Mazo).
@@ -139,16 +136,42 @@ reparte_cartas():-
   format('Generando mazo inicial...~n'),
   mazo(M),
   format('Generando mano de cada jugador...~n'),
-  generar_manos_jugadores(20, 5, M, Manos),
-  format('Manos generadas:~n'),
-  imprimir_lista_de_listas(Manos),
+  generar_manos_jugadores(4, 5, M, Manos),
+  Manos = [Mano1, Mano2, Mano3, Mano4],
   format('Evaluando manos...~n'),
-  maplist(figura_maxima, Manos, Figuras),
+  figura_maxima(Mano1, Figura1),
+  figura_maxima(Mano2, Figura2),
+  figura_maxima(Mano3, Figura3),
+  figura_maxima(Mano4, Figura4),
+  Jugadores = [
+    [1, Mano1, Figura1],
+    [2, Mano2, Figura2],
+    [3, Mano3, Figura3],
+    [4, Mano4, Figura4]
+  ],
+  ordenar_jugadores(Jugadores, JugadoresOrdenados),
   format('Resultado:\n',[]),
   format('Lugar Jugador   Figura        Mano\n',[]),
   format('==========================================================\n',[]),
-  imprimir_resultados(Manos, Figuras),
+  imprimir_resultados(JugadoresOrdenados),
   !.
+
+% comparar_jugador/3
+% comparar_jugador(+Dif, +Jugador1, +Jugador2)
+% Dif es el resultado de comparar Jugador1 y Jugador2
+comparar_jugador(Dif, [ID1, _, Figura1], [ID2, _, Figura2]) :-
+    valor_figura(Figura1, Valor1),
+    valor_figura(Figura2, Valor2),
+    (   Valor1 = Valor2
+    ->  compare(Dif, ID1, ID2)  % Usa el ID como desempate si las manos son iguales
+    ;   compare(Dif, Valor2, Valor1)  % De lo contrario, compara basándose en el valor de la mano
+    ).
+
+% ordenar_jugadores/2
+% ordenar_jugadores(+Jugadores, -JugadoresOrdenados)
+% JugadoresOrdenados es una lista de jugadores ordenados de mayor a menor puntaje según valor_figura/1.
+ordenar_jugadores(Jugadores, JugadoresOrdenados) :-
+    predsort(comparar_jugador, Jugadores, JugadoresOrdenados).
 
 % imprimir_lista_de_listas/1
 % imprimir_lista_de_listas(+ListaDeListas)
@@ -166,7 +189,7 @@ mismo_palo(Mano):-
 
 % figura_maxima/2
 % figura_maxima(+Mano, -Figura)
-% Figura es la figura máxima de la Mano
+% Figura es la figura máxima de la Mano, se aprovecha del orden de evaluación del motor de inferencia.
 figura_maxima(Mano, "Flor Imperial"):-
   figura_flor_imperial(Mano).
 figura_maxima(Mano, "Flor"):-
@@ -186,17 +209,18 @@ figura_maxima(Mano, "Doble Par"):-
 figura_maxima(Mano, "Par"):-
   figura_par(Mano).
 figura_maxima(_, "Nada"):- % Si no es ninguna de las anteriores, entonces es Nada.
-  format('Nada~n', []).
+  format('- Nada~n', []).
 
 % imprimir_resultados/2
 % imprimir_resultados(+Manos, +Figuras)
 % Imprime los resultados de las manos.
-imprimir_resultados([], []).
-imprimir_resultados([Mano | RestoM], [Figura | RestoF]):-
-  length(RestoM, L),
+imprimir_resultados([]).
+imprimir_resultados([Jugador | Resto]):-
+  length(Resto, L),
   Posicion is 4 - L,
-  format('~|~w~5+~| ~|~w~9+ ~|~w~13+ ~w~n', [Posicion, "Jugador-1", Figura, Mano]),
-  imprimir_resultados(RestoM, RestoF).
+  Jugador = [ID, Mano, Figura],
+  format('~|~w~5+~| ~|Jugador-~w~9+ ~|~w~13+ ~w~n', [Posicion, ID, Figura, Mano]),
+  imprimir_resultados(Resto).
 
 
 % figura_par/1 
@@ -208,7 +232,7 @@ figura_par(Mano):-
   member(V3-_, Resto), member(V4-_, Resto), member(V5-_, Resto),
   V3 \== V4, V3 \== V5, V4 \== V5,
   V3 \== V, V4 \== V, V5 \== V,
-  format('Par de ~w~n', [V]).
+  format('- Par de ~w~n', [V]).
 
 % figura_doble_par/1
 % figura_doble_par(+Mano)
@@ -221,7 +245,7 @@ figura_doble_par(Mano):-
   member(V5-_, Resto4), 
   V5 \== V, V5 \== V3, 
   V \== V3, 
-  format('Doble par de ~w y ~w~n', [V, V3]).
+  format('- Doble par de ~w y ~w~n', [V, V3]).
 
 % figura_tercia/1
 % figura_tercia(+Mano)
@@ -232,7 +256,7 @@ figura_tercia(Mano):-
   member(V3-_, Resto2), V3 == V,
   member(V4-_, Resto2), member(V5-_, Resto2),
   V4 \== V5, V4 \== V, V5 \== V,
-  format('Tercia de ~w~n', [V]).
+  format('- Tercia de ~w~n', [V]).
 
 % figura_escalera/1
 % figura_escalera(+Mano)
@@ -243,14 +267,14 @@ figura_escalera(Mano):-
   member(Carta3, Resto2), carta_consecutiva_a(Carta3, Carta2),select(Carta3, Resto2, Resto3),
   member(Carta4, Resto3), carta_consecutiva_a(Carta4, Carta3),select(Carta4, Resto3, Resto4),
   member(Carta5, Resto4), carta_consecutiva_a(Carta5, Carta4),
-  format('Escalera~n', []).
+  format('- Escalera~n', []).
 
 % figura_color/1
 % figura_color(+Mano)
 % Mano es una lista de cartas que contiene un color
 figura_color(Mano):-
   mismo_palo(Mano),
-  format('Color~n', []).
+  format('- Color~n', []).
 
 % figura_full/1
 % figura_full(+Mano)
@@ -262,7 +286,7 @@ figura_full(Mano):-
   member(V4-_, Resto3), select(V4-_, Resto3, Resto4),
   member(V5-_, Resto4), V5 == V4,
   V5 \== V,
-  format('Full~n', []).
+  format('- Full~n', []).
 
 % figura_poker/1
 % figura_poker(+Mano)
@@ -273,7 +297,7 @@ figura_poker(Mano):-
   member(V3-_, Resto2), V3 == V, select(V3-_, Resto2, Resto3),
   member(V4-_, Resto3), V4 == V, select(V4-_, Resto3, Resto4),
   member(V5-_, Resto4), V5 \== V,
-  format('Poker de ~w~n', [V]).
+  format('- Poker de ~w~n', [V]).
 
 % figura_flor/1 
 % figura_flor(+Mano) 
@@ -281,7 +305,7 @@ figura_poker(Mano):-
 figura_flor(Mano):-
   mismo_palo(Mano),
   figura_escalera(Mano),
-  format('Flor~n', []).
+  format('- Flor~n', []).
 
 % figura_flor_imperial/1 
 % figura_flor_imperial(+Mano) 
@@ -291,7 +315,7 @@ figura_flor_imperial(Mano):-
   figura_escalera(Mano),
   member(10-_, Mano),
   member('A'-_, Mano),
-  format('Flor Imperial~n', []).
+  format('- Flor Imperial~n', []).
 
 % carta_consecutiva_a/2
 % carta_consecutiva_a(+Carta1, +Carta2)
@@ -309,3 +333,29 @@ carta_consecutiva_a(V1-_, V2-_):- % Este es el caso dónde ambas cartas son pers
   nth0(Indice2, L, V2),
   Indice1 < Indice2,
   Indice2 is Indice1 + 1, !.
+
+% =============================================================================
+% Pruebas
+% Esta sección solo contiene código utilizado para probar cada una de las figuras,
+% puede ser muy útil para depurar el programa.
+% =============================================================================
+
+% Estas listas son para hacer pruebas.
+%lista_cartas_prueba([10-'♦️', 'J'-'♦️', 'Q'-'♦️', 'K'-'♦️','A'-'♦️']). % Flor Imperial
+%lista_cartas_prueba([7-'♥️', 8-'♥️', 9-'♥️', 10-'♥️', 'J'-'♥️']). % Flor
+%lista_cartas_prueba(['A'-'♠️', 'A'-'♥️', 'A'-'♣️', 'A'-'♦️', 'K'-'♠️']). % Poker de A
+%lista_cartas_prueba(['A'-'♠️', 'A'-'♥️', 'A'-'♣️', 2-'♦️', 2-'♠️']). % Full
+%lista_cartas_prueba(['A'-'♠️', 'A'-'♠️', 2-'♠️', 3-'♠️', 'K'-'♠️']). % Color
+%lista_cartas_prueba([3-'♠️', 4-'♥️', 5-'♣️', 6-'♦️', 7-'♠️']). % Escalera
+%lista_cartas_prueba(['A'-'♠️', 'A'-'♥️', 'A'-'♣️', 2-'♦️', 'K'-'♠️']). % Tercia de A
+%lista_cartas_prueba(['A'-'♠️', 'A'-'♥️', 2-'♣️', 2-'♦️', 'K'-'♠️']). % Doble par de A y 2
+%lista_cartas_prueba(['A'-'♠️', 'A'-'♥️', 2-'♣️', 3-'♦️', 4-'♠️']). % Par de A
+
+% prueba():-
+%   lista_cartas_prueba(L),
+%   random_permutation(L, L2),
+%   format('Lista de cartas de prueba: ~w~n', [L]),
+%   figura_maxima(L, _),
+%   format('Lista de cartas de prueba barajada: ~w~n', [L2]),
+%   figura_maxima(L2, _),
+%   !.
