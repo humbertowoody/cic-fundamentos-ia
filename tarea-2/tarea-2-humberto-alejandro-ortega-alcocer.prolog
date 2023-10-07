@@ -11,7 +11,7 @@
 %   2. El programa generará un mazo de cartas, repartirá 5 cartas a 4 jugadores,
 %      evaluará las manos y mostrará los resultados.
 %   3. El programa terminará, si se desea jugar otra partida, ejecutar el predicado
-%      reparte_cartas/0 nuevamente.
+%      reiniciar/0.
 % 
 % Fundamentos de Inteligencia Artificial, CIC, IPN, 2023.
 % =============================================================================
@@ -155,6 +155,13 @@ reparte_cartas():-
   format('==========================================================\n',[]),
   imprimir_resultados(JugadoresOrdenados),
   !.
+
+% reiniciar/0
+% reiniciar()
+% Reinicia el programa
+reiniciar():-
+  format('Reiniciando programa...~n'),
+  reparte_cartas().
 
 % comparar_jugador/3
 % comparar_jugador(+Dif, +Jugador1, +Jugador2)
