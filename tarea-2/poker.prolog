@@ -61,6 +61,26 @@ carta_valor(Valor-Palo):-
   valor(Valor),
   palo(Palo).
 
+% Estas listas son para hacer pruebas.
+lista_cartas_prueba([10-'♦️', 'J'-'♦️', 'Q'-'♦️', 'K'-'♦️','A'-'♦️']). % Flor Imperial
+%lista_cartas_prueba([7-'♥️', 8-'♥️', 9-'♥️', 10-'♥️', 'J'-'♥️']). % Flor
+%lista_cartas_prueba(['A'-'♠️', 'A'-'♥️', 'A'-'♣️', 'A'-'♦️', 'K'-'♠️']). % Poker de A
+%lista_cartas_prueba(['A'-'♠️', 'A'-'♥️', 'A'-'♣️', 2-'♦️', 2-'♠️']). % Full
+%lista_cartas_prueba(['A'-'♠️', 'A'-'♠️', 2-'♠️', 3-'♠️', 'K'-'♠️']). % Color
+%lista_cartas_prueba([3-'♠️', 4-'♥️', 5-'♣️', 6-'♦️', 7-'♠️']). % Escalera
+%lista_cartas_prueba(['A'-'♠️', 'A'-'♥️', 'A'-'♣️', 2-'♦️', 'K'-'♠️']). % Tercia de A
+%lista_cartas_prueba(['A'-'♠️', 'A'-'♥️', 2-'♣️', 2-'♦️', 'K'-'♠️']). % Doble par de A y 2
+%lista_cartas_prueba(['A'-'♠️', 'A'-'♥️', 2-'♣️', 3-'♦️', 4-'♠️']). % Par de A
+
+prueba():-
+  lista_cartas_prueba(L),
+  random_permutation(L, L2),
+  format('Lista de cartas de prueba: ~w~n', [L]),
+  figura_maxima(L, _),
+  format('Lista de cartas de prueba barajada: ~w~n', [L2]),
+  figura_maxima(L2, _),
+  !.
+
 % baraja/1
 % baraja(-Baraja)
 % Baraja es una lista con todas las cartas de la baraja (sin comodines).
@@ -188,22 +208,9 @@ figura_par(Mano):-
   member(V3-_, Resto), member(V4-_, Resto), member(V5-_, Resto),
   V3 \== V4, V3 \== V5, V4 \== V5,
   V3 \== V, V4 \== V, V5 \== V,
-  format('Par de ~w~n', [V]),
-  !.
+  format('Par de ~w~n', [V]).
 
-% figura_tercia/1 
-% figura_tercia(+Mano) 
-% Mano es una lista de cartas que contiene una tercia
-figura_tercia(Mano):-
-  member(V-_, Mano), select(V-_, Mano, Resto),
-  member(V2-_, Resto), V2 == V, select(V2-_, Resto, Resto2),
-  member(V3-_, Resto2), V3 == V, 
-  member(V4-_, Resto2), member(V5-_, Resto2),
-  V4 \== V5, V4 \== V, V5 \== V,
-  format('Tercia de ~w~n', [V]),
-  !.
-
-% figura_doble_par/1 
+% figura_doble_par/1
 % figura_doble_par(+Mano)
 % Mano es una lista de cartas que contiene un doble par
 figura_doble_par(Mano):-
@@ -214,46 +221,59 @@ figura_doble_par(Mano):-
   member(V5-_, Resto4), 
   V5 \== V, V5 \== V3, 
   V \== V3, 
-  format('Doble par de ~w y ~w~n', [V, V3]),
-  !.
+  format('Doble par de ~w y ~w~n', [V, V3]).
 
-% figura_escalera/1 
+% figura_tercia/1
+% figura_tercia(+Mano)
+% Mano es una lista de cartas que contiene una tercia
+figura_tercia(Mano):-
+  member(V-_, Mano), select(V-_, Mano, Resto),
+  member(V2-_, Resto), V2 == V, select(V2-_, Resto, Resto2),
+  member(V3-_, Resto2), V3 == V,
+  member(V4-_, Resto2), member(V5-_, Resto2),
+  V4 \== V5, V4 \== V, V5 \== V,
+  format('Tercia de ~w~n', [V]).
+
+% figura_escalera/1
 % figura_escalera(+Mano)
 % Mano es una lista de cartas que contiene una escalera
 figura_escalera(Mano):-
-  Mano = [Carta1, Carta2, Carta3, Carta4, Carta5],
-  carta_consecutiva_a(Carta1, Carta2),
-  carta_consecutiva_a(Carta2, Carta3),
-  carta_consecutiva_a(Carta3, Carta4),
-  carta_consecutiva_a(Carta4, Carta5),
-  format('Escalera~n', []),
-  !.
+  member(Carta1, Mano), select(Carta1, Mano, Resto),
+  member(Carta2, Resto), carta_consecutiva_a(Carta2, Carta1),select(Carta2, Resto, Resto2),
+  member(Carta3, Resto2), carta_consecutiva_a(Carta3, Carta2),select(Carta3, Resto2, Resto3),
+  member(Carta4, Resto3), carta_consecutiva_a(Carta4, Carta3),select(Carta4, Resto3, Resto4),
+  member(Carta5, Resto4), carta_consecutiva_a(Carta5, Carta4),
+  format('Escalera~n', []).
 
-% figura_color/1 
-% figura_color(+Mano) 
+% figura_color/1
+% figura_color(+Mano)
 % Mano es una lista de cartas que contiene un color
 figura_color(Mano):-
   mismo_palo(Mano),
-  format('Color~n', []),
-  !.
+  format('Color~n', []).
 
 % figura_full/1
 % figura_full(+Mano)
 % Mano es una lista de cartas que contiene un full
 figura_full(Mano):-
-  figura_tercia(Mano),
-  figura_par(Mano),
-  format('Full~n', []),
-  !.
+  member(V-_, Mano), select(V-_, Mano, Resto),
+  member(V2-_, Resto), V2 == V, select(V2-_, Resto, Resto2),
+  member(V3-_, Resto2), V3 == V,  select(V3-_, Resto2, Resto3),
+  member(V4-_, Resto3), select(V4-_, Resto3, Resto4),
+  member(V5-_, Resto4), V5 == V4,
+  V5 \== V,
+  format('Full~n', []).
 
-% figura_poker/1 
-% figura_poker(+Mano) 
+% figura_poker/1
+% figura_poker(+Mano)
 % Mano es una lista de cartas que contiene un poker
 figura_poker(Mano):-
-  Mano = [Carta1, Carta2, Carta3, Carta4, Carta5],
-  Carta1 = V-_, Carta2 = V-_, Carta3 = V-_, Carta4 = V-_, Carta5 = V-_,
-  format('Poker de ~w~n', [V]),
-  !.
+  member(V-_, Mano), select(V-_, Mano, Resto),
+  member(V2-_, Resto), V2 == V, select(V2-_, Resto, Resto2),
+  member(V3-_, Resto2), V3 == V, select(V3-_, Resto2, Resto3),
+  member(V4-_, Resto3), V4 == V, select(V4-_, Resto3, Resto4),
+  member(V5-_, Resto4), V5 \== V,
+  format('Poker de ~w~n', [V]).
 
 % figura_flor/1 
 % figura_flor(+Mano) 
@@ -261,8 +281,7 @@ figura_poker(Mano):-
 figura_flor(Mano):-
   mismo_palo(Mano),
   figura_escalera(Mano),
-  format('Flor~n', []),
-  !.
+  format('Flor~n', []).
 
 % figura_flor_imperial/1 
 % figura_flor_imperial(+Mano) 
@@ -270,31 +289,23 @@ figura_flor(Mano):-
 figura_flor_imperial(Mano):-
   mismo_palo(Mano),
   figura_escalera(Mano),
-  Mano = [Carta1 | _],
-  Carta1 = V-_, 
-  V == 10,
-  format('Flor Imperial~n', []),
-  !.
+  member(10-_, Mano),
+  member('A'-_, Mano),
+  format('Flor Imperial~n', []).
 
 % carta_consecutiva_a/2
 % carta_consecutiva_a(+Carta1, +Carta2)
 % Carta1 es consecutiva a Carta2 si su valor es consecutivo.
-carta_consecutiva_a(Carta1, Carta2):- % Este es el caso dónde ambas cartas son números.
-  Carta1 = V1-_, Carta2 = V2-_,
+carta_consecutiva_a(V1-_, V2-_):- % Este es el caso dónde ambas cartas son números.
   integer(V1), integer(V2),
   V1 > V2,
-  V1 is V2 + 1.
-carta_consecutiva_a(Carta1, Carta2):- % Este es el caso dónde Carta1 es un personaje y Carta2 es un numero.
-  Carta1 = V1-_, Carta2 = V2-_,
-  personaje(V1), integer(V2),
-  V1 == 'J',
-  V2 == 10.
-carta_consecutiva_a(Carta1, Carta2):- % Este es el caso dónde ambas cartas son personajes.
-  Carta1 = V1-_, Carta2 = V2-_,
+  V1 is (V2 + 1), !.
+carta_consecutiva_a('J'-_, 10-_):- % Este es el caso dónde Carta1 es un personaje y Carta2 es un numero.
+  !.
+carta_consecutiva_a(V1-_, V2-_):- % Este es el caso dónde ambas cartas son personajes.
   personaje(V1), personaje(V2),
   lista_personajes(L),
   nth0(Indice1, L, V1),
   nth0(Indice2, L, V2),
-  Indice1 > Indice2,
-  Indice1 is Indice2 + 1.
-
+  Indice1 < Indice2,
+  Indice2 is Indice1 + 1, !.
