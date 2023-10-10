@@ -139,10 +139,10 @@ reparte_cartas():-
   generar_manos_jugadores(4, 5, M, Manos),
   Manos = [Mano1, Mano2, Mano3, Mano4],
   format('Evaluando manos...~n'),
-  figura_maxima(Mano1, Figura1),
-  figura_maxima(Mano2, Figura2),
-  figura_maxima(Mano3, Figura3),
-  figura_maxima(Mano4, Figura4),
+  figura_máxima(Mano1, Figura1),
+  figura_máxima(Mano2, Figura2),
+  figura_máxima(Mano3, Figura3),
+  figura_máxima(Mano4, Figura4),
   Jugadores = [
     [1, Mano1, Figura1],
     [2, Mano2, Figura2],
@@ -194,28 +194,28 @@ imprimir_lista_de_listas([Lista|Resto]) :-
 mismo_palo(Mano):-
   Mano = [_-Palo, _-Palo, _-Palo, _-Palo, _-Palo].
 
-% figura_maxima/2
-% figura_maxima(+Mano, -Figura)
+% figura_máxima/2
+% figura_máxima(+Mano, -Figura)
 % Figura es la figura máxima de la Mano, se aprovecha del orden de evaluación del motor de inferencia.
-figura_maxima(Mano, "Flor Imperial"):-
+figura_máxima(Mano, "Flor Imperial"):-
   figura_flor_imperial(Mano).
-figura_maxima(Mano, "Flor"):-
+figura_máxima(Mano, "Flor"):-
   figura_flor(Mano).
-figura_maxima(Mano, "Poker"):-
+figura_máxima(Mano, "Poker"):-
   figura_poker(Mano).
-figura_maxima(Mano, "Full"):-
+figura_máxima(Mano, "Full"):-
   figura_full(Mano).
-figura_maxima(Mano, "Color"):-
+figura_máxima(Mano, "Color"):-
   figura_color(Mano).
-figura_maxima(Mano, "Escalera"):-
+figura_máxima(Mano, "Escalera"):-
   figura_escalera(Mano). 
-figura_maxima(Mano, "Tercia"):-
+figura_máxima(Mano, "Tercia"):-
   figura_tercia(Mano).
-figura_maxima(Mano, "Doble Par"):-
+figura_máxima(Mano, "Doble Par"):-
   figura_doble_par(Mano).
-figura_maxima(Mano, "Par"):-
+figura_máxima(Mano, "Par"):-
   figura_par(Mano).
-figura_maxima(_, "Nada"):- % Si no es ninguna de las anteriores, entonces es Nada.
+figura_máxima(_, "Nada"):- % Si no es ninguna de las anteriores, entonces es Nada.
   format('- Nada~n', []).
 
 % imprimir_resultados/2
@@ -362,7 +362,7 @@ carta_consecutiva_a(V1-_, V2-_):- % Este es el caso dónde ambas cartas son pers
 %   lista_cartas_prueba(L),
 %   random_permutation(L, L2),
 %   format('Lista de cartas de prueba: ~w~n', [L]),
-%   figura_maxima(L, _),
+%   figura_máxima(L, _),
 %   format('Lista de cartas de prueba barajada: ~w~n', [L2]),
-%   figura_maxima(L2, _),
+%   figura_máxima(L2, _),
 %   !.
