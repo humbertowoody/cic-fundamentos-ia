@@ -1,6 +1,6 @@
 % =============================================================================
 % Humberto Alejandro Ortega Alcocer, ESCOM, 2016630495.
-% 
+%
 % Tarea 2 - Figuras del Póker.
 %           Construir un programa en Prolog que genere un mazo de cartas,
 %           reparta 5 cartas a 4 jugadores, evalúe las manos y muestre los
@@ -12,13 +12,13 @@
 %      evaluará las manos y mostrará los resultados.
 %   3. El programa terminará, si se desea jugar otra partida, ejecutar el predicado
 %      reiniciar/0.
-% 
+%
 % Fundamentos de Inteligencia Artificial, CIC, IPN, 2023.
 % =============================================================================
 
 
 % =============================================================================
-% Hechos 
+% Hechos
 % =============================================================================
 
 % Lista con los palos disponibles, en el orden de prioridad de la baraja.
@@ -95,7 +95,7 @@ barajar(Baraja1, Baraja2):- random_permutation(Baraja1, Baraja2).
 carta_al_azar(Mazo, Carta, NuevoMazo):-
   [Carta | NuevoMazo] = Mazo.
 
-% mazo/1 
+% mazo/1
 % mazo(-Mazo)
 % Mazo es un mazo de cartas barajado con comodines
 mazo(Mazo):-
@@ -208,7 +208,7 @@ figura_máxima(Mano, "Full"):-
 figura_máxima(Mano, "Color"):-
   figura_color(Mano).
 figura_máxima(Mano, "Escalera"):-
-  figura_escalera(Mano). 
+  figura_escalera(Mano).
 figura_máxima(Mano, "Tercia"):-
   figura_tercia(Mano).
 figura_máxima(Mano, "Doble Par"):-
@@ -230,12 +230,12 @@ imprimir_resultados([Jugador | Resto]):-
   imprimir_resultados(Resto).
 
 
-% figura_par/1 
-% figura_par(+Mano) 
+% figura_par/1
+% figura_par(+Mano)
 % Mano es una lista de cartas que contiene un par
 figura_par(Mano):-
-  member(V-_, Mano), select(V-_, Mano, Resto), 
-  member(V2-_, Resto), V == V2, 
+  member(V-_, Mano), select(V-_, Mano, Resto),
+  member(V2-_, Resto), V == V2,
   member(V3-_, Resto), member(V4-_, Resto), member(V5-_, Resto),
   V3 \== V4, V3 \== V5, V4 \== V5,
   V3 \== V, V4 \== V, V5 \== V,
@@ -249,9 +249,9 @@ figura_doble_par(Mano):-
   member(V2-_, Resto), V2 == V, select(V2-_, Resto, Resto2),
   member(V3-_, Resto2), select(V3-_, Resto2, Resto3),
   member(V4-_, Resto3), V4 == V3, select(V4-_, Resto3, Resto4),
-  member(V5-_, Resto4), 
-  V5 \== V, V5 \== V3, 
-  V \== V3, 
+  member(V5-_, Resto4),
+  V5 \== V, V5 \== V3,
+  V \== V3,
   format('- Doble par de ~w y ~w~n', [V, V3]).
 
 % figura_tercia/1
@@ -306,16 +306,16 @@ figura_poker(Mano):-
   member(V5-_, Resto4), V5 \== V,
   format('- Poker de ~w~n', [V]).
 
-% figura_flor/1 
-% figura_flor(+Mano) 
+% figura_flor/1
+% figura_flor(+Mano)
 % Mano es una lista de cartas que contiene una flor
 figura_flor(Mano):-
   mismo_palo(Mano),
   figura_escalera(Mano),
   format('- Flor~n', []).
 
-% figura_flor_imperial/1 
-% figura_flor_imperial(+Mano) 
+% figura_flor_imperial/1
+% figura_flor_imperial(+Mano)
 % Mano es una lista de cartas que contiene una flor imperial
 figura_flor_imperial(Mano):-
   mismo_palo(Mano),
