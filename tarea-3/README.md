@@ -1,6 +1,6 @@
 # Tarea 3
 
-En esta tarea vimos inicialmente _El problema de la Cebra_ y de ahí partimos
+En esta tarea vimos inicialmente [_El problema de la Cebra_][wikipedia-problema-cebra] y de ahí partimos
 para poder resolver problemas similares en Prolog. La intención es básicamente
 modelar las pistas adecuadamente y dejar que Prolog resuelva el problema en
 sí.
@@ -55,3 +55,5 @@ findall(X, visualiza_vecindario(X), Resultados), maplist(writeln, Resultados).
 ---
 
 Humberto Alejandro Ortega Alcocer, 2023.
+
+[wikipedia-problema-cebra]: https://es.wikipedia.org/wiki/Acertijo_de_la_cebra
