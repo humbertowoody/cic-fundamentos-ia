@@ -44,6 +44,16 @@ junto(C1, C2, Lista):- append(_, [C2, C1 | _], Lista).
 % C1 es posterior a C2 en la lista Lista.
 posterior_a(C1, C2, Lista):- append(_, [C1 | R], Lista), member(C2, R).
 
+% único/2
+% único(+Pos, +Vecindario)
+% Asegura que los valores del atributo en la posición Pos sean únicos en el Vecindario.
+único(Pos, Vecindario) :-
+    findall(Valor, (member(Casa, Vecindario), arg(Pos, Casa, Valor), nonvar(Valor)), Valores), % Encontramos todos los valores del atributo en la posición Pos.
+    sort(Valores, ValoresÚnicos),                                                              % Quitamos los valores repetidos.
+    length(Valores, LenValores),                                                               % Obtenemos la longitud de la lista de valores.
+    length(ValoresÚnicos, LenValoresÚnicos),                                                   % Obtenemos la longitud de la lista de valores únicos.
+    LenValores =:= LenValoresÚnicos.                                                           % Si son iguales, entonces todos los valores son únicos.
+
 % visualiza_vecindario/1
 % visualiza_vecindario(-V)
 % V es una lista de cuatro casas que cumplen las siguientes condiciones:
@@ -57,5 +67,8 @@ visualiza_vecindario(V):-
   entre2(casa(_, _, _, caballos), casa(_, _, _, mariposas), V), % 6 Hay dos casas entre la del dueño de caballos y la casa del dueño de mariposas...
   posterior_a(casa(_, _, tennis, _), casa(_, _, boliche, _), V),% 7 El bolichista vive en algún lugar posterior a la casa del tenista...
   entre(casa(_, _, volleyball, _), casa(_, blanco, _, _), V),   % 8 Hay una casa entre la del que juega voleyball y la casa blanca...
-  V = [casa(ruso, _, _, _) | _ ].                               % 9 Un ruso vive en la primera casa...
+  V = [casa(ruso, _, _, _) | _ ],                               % 9 Un ruso vive en la primera casa...
+  % La siguiente invocación sólamente sirve para asegurarnos de que sólo existe uno de los atributos en la lista final.
+  % Usé un forall/2 porque es más fácil que llamar a único/2 para cada atributo.
+  forall(between(1, 4, Pos), único(Pos, V)).
 
