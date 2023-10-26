@@ -5,7 +5,7 @@
 %           Versión 3: 4 casas, 4 atributos y 9 pistas.
 %
 % Propuesta de Ejecución:
-%   1. Ejecutar el predicado vecindario/1.
+%   1. Ejecutar el predicado visualiza_vecindario/1.
 %   2. El programa ofrecerá las soluciones posibles.
 %
 % Fundamentos de Inteligencia Artificial, CIC, IPN, 2023.
