@@ -31,7 +31,7 @@ color(línea_B, gris_verde).
 color(línea_12, dorado).
 
 trayecto(línea_1, observatorio, pantitlán).
-trayecto(línea_1, cuatro_caminos, tasqueña).
+trayecto(línea_2, cuatro_caminos, tasqueña).
 trayecto(línea_3, indios_verdes, universidad).
 trayecto(línea_4, martín_carrera, santa_anita).
 trayecto(línea_5, politécnico, pantitlán).
