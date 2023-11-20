@@ -45,7 +45,7 @@
 % edo_válido(+estado)
 % Verdadero si el estado proporcionado es válido. Es decir, si cumple con las
 % restricciones del problema de los misioneros y caníbales.
-edo_válido([Mis1,Can1,Mis2,Can2]) :-
+edo_válido([Mis1,Can1,Mis2,Can2]):-
     Mis1 >= 0, Can1 >= 0,
     Mis2 >= 0, Can2 >= 0,
     (Mis1 >= Can1 ; Mis1 is 0),
@@ -56,7 +56,7 @@ edo_válido([Mis1,Can1,Mis2,Can2]) :-
 % movimiento(+estado,-estado)
 % Verdadero si existe un estado inicial tal que al aplicar un movimiento se pueda
 % llegar a un estado destino que sea válido.
-movimiento([MO,CO,MD,CD,L1],[MO2,CO2,MD2,CD2,L2]) :-
+movimiento([MO,CO,MD,CD,L1],[MO2,CO2,MD2,CD2,L2]):-
     % Un misionero.
     ( (MO2 is MO - 1, CO2 is CO, MD2 is MD + 1, CD2 is CD, L1 = 'o', L2 = 'd');
       (MO2 is MO + 1, CO2 is CO, MD2 is MD - 1, CD2 is CD, L1 = 'd', L2 = 'o');
@@ -78,7 +78,7 @@ movimiento([MO,CO,MD,CD,L1],[MO2,CO2,MD2,CD2,L2]) :-
 % sucesores/2
 % sucesores(+estado,-sucesores)
 % Sucesores es una lista con los estados sucesores del estado proporcionado.
-sucesores([Edo|Resto], Sucesores) :-
+sucesores([Edo|Resto], Sucesores):-
     findall([S,Edo|Resto], (movimiento(Edo,S), \+member(S,[Edo|Resto])),Sucesores).
 
 % busca_BFS/3
@@ -86,7 +86,7 @@ sucesores([Edo|Resto], Sucesores) :-
 % Verdadero si plan es una lista con los estados requeridos para llegar del estado
 % inicial al estado meta. Se usa reverse para que el plan se muestre en el orden
 % correcto.
-busca_BFS(Ei,Em,Plan) :-
+busca_BFS(Ei,Em,Plan):-
     bfs(Em,[[Ei]],Ruta),
     reverse(Ruta,Plan).
 
@@ -96,7 +96,7 @@ busca_BFS(Ei,Em,Plan) :-
 % inicial, con el cual inicia la agenda, al estado meta. Utilizando una agenda de
 % tipo cola (FIFO). La búsqueda se realiza en anchura.
 bfs(Meta,[[Meta|Trayecto]|_],[Meta|Trayecto]).
-bfs(Meta,[Candidato|Frontera],Ruta) :-
+bfs(Meta,[Candidato|Frontera],Ruta):-
     sucesores(Candidato,Suc),
     append(Frontera,Suc,NuevaAgenda),
     bfs(Meta,NuevaAgenda,Ruta).
@@ -106,7 +106,7 @@ bfs(Meta,[Candidato|Frontera],Ruta) :-
 % Verdadero si plan es una lista con los estados requeridos para llegar del estado
 % inicial al estado meta. Se usa reverse para que el plan se muestre en el orden
 % correcto.
-busca_DFS(Ei,Em,Plan) :-
+busca_DFS(Ei,Em,Plan):-
     dfs(Em,[[Ei]],Ruta),
     reverse(Ruta,Plan).
 
@@ -116,7 +116,7 @@ busca_DFS(Ei,Em,Plan) :-
 % inicial, con el cual inicia la agenda, al estado meta. Utilizando una agenda de
 % tipo pila (LIFO). La búsqueda se realiza en profundidad.
 dfs(Meta,[[Meta|Trayecto]|_],[Meta|Trayecto]).
-dfs(Meta,[Candidato|Frontera],Ruta) :-
+dfs(Meta,[Candidato|Frontera],Ruta):-
   sucesores(Candidato,Suc),
   append(Suc,Frontera,NuevaAgenda),
   dfs(Meta,NuevaAgenda,Ruta).
@@ -133,7 +133,7 @@ dfs(Meta,[Candidato|Frontera],Ruta) :-
 % Verdadero si plan es una lista con los estados requeridos para llegar del estado
 % inicial al estado meta. Se usa reverse para que el plan se muestre en el orden
 % correcto. Se utiliza dfs/2 para realizar la busqueda en profundidad iterativa.
-busca_IDS(Ei,Em,Plan) :-
+busca_IDS(Ei,Em,Plan):-
     retractall(edo_meta(_)),
     assert(edo_meta(Em)),
     dfs([[Ei]],Ruta),
@@ -145,8 +145,8 @@ busca_IDS(Ei,Em,Plan) :-
 % inicial, con el cual inicia la agenda, al estado meta. Utilizando una agenda de
 % tipo pila (LIFO). La búsqueda se realiza en profundidad (DFS), pero es iterativa
 % debido a que se realiza de manera ordenada.
-dfs([[Meta|Trayecto]|_],[Meta|Trayecto]) :- edo_meta(Meta).
-dfs([Candidato|Frontera],Ruta) :-
+dfs([[Meta|Trayecto]|_],[Meta|Trayecto]):- edo_meta(Meta).
+dfs([Candidato|Frontera],Ruta):-
     sucesores(Candidato,Suc),
     append(Suc,Frontera,NuevaAgenda),
     dfs(NuevaAgenda,Ruta).
@@ -155,7 +155,7 @@ dfs([Candidato|Frontera],Ruta) :-
 % nombre_movimiento(+estado inicio,+estado destino,-movimiento)
 % Movimiento es una cadena de texto que indica el tipo de movimiento que se realizó
 % para llegar del estado inicio al estado destino.
-nombre_movimiento([MO,CO,MD,CD,L1],[MO2,CO2,MD2,CD2,L2],Movimiento) :-
+nombre_movimiento([MO,CO,MD,CD,L1],[MO2,CO2,MD2,CD2,L2],Movimiento):-
   % Un misionero
   ( ((MO2 is MO - 1, CO2 is CO, MD2 is MD + 1, CD2 is CD, L1 = 'o', L2 = 'd'),Movimiento = 'UN-MISIONERO');
     ((MO2 is MO + 1, CO2 is CO, MD2 is MD - 1, CD2 is CD, L1 = 'd', L2 = 'o'),Movimiento = 'UN-MISIONERO');
@@ -177,12 +177,12 @@ nombre_movimiento([MO,CO,MD,CD,L1],[MO2,CO2,MD2,CD2,L2],Movimiento) :-
 % despliega_pasos(+plan,+número de movimiento)
 % Imprime el número de paso seguido del movimiento realizado para llegar al estado
 % destino.
-despliega_pasos([Origen,Destino],N) :-
+despliega_pasos([Origen,Destino],N):-
   Destino = [MO,CO,MD,CD,L1],
   ((L1 = o, Barca_origen is 1, Barca_destino is 0) ; (L1 = d, Barca_origen is 0, Barca_destino is 1)),
   nombre_movimiento(Origen,Destino,Movimiento),
-  format('(~w)~t aplicando ~w~t se llega a ((~w ~w ~w) (~w ~w ~w))\n', [N,Movimiento,MO,CO,Barca_origen,MD,CD,Barca_destino]),!.
-despliega_pasos([Origen,Destino|Resto],N) :-
+  format('(~w)~t Aplicando ~w~t se llega a ((~w ~w ~w) (~w ~w ~w))\n', [N,Movimiento,MO,CO,Barca_origen,MD,CD,Barca_destino]),!.
+despliega_pasos([Origen,Destino|Resto],N):-
   Destino \= [],
   Resto \= [],
   Destino = [MO,CO,MD,CD,L1],
@@ -195,7 +195,7 @@ despliega_pasos([Origen,Destino|Resto],N) :-
 % despliega/1
 % despliega(+plan)
 % Impresión de la solución del problema de los misioneros y caníbales.
-despliega(Plan) :-
+despliega(Plan):-
   length(Plan, Tamaño),
   Num_Pasos is Tamaño - 1,
   Plan = [Inicio|_],
