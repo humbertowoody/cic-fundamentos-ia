@@ -12,7 +12,6 @@
 
 estado_inicial([15,1]).
 estado_meta([15,30]).
-%estado_meta([18,3]).
 
 acceso([1,1], [[1,2],[2, 1]]).
 acceso([1,2], [[1,1],[1,3]]).
