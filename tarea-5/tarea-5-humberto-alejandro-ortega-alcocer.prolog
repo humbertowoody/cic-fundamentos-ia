@@ -32,6 +32,13 @@
 %       prueba_greedy.
 %     - UniformCost
 %       prueba_uniform_cost.
+%     - Prueba General: esta prueba muestra los resultados de A*, Greedy y
+%                  UniformCost, usando las dos heurísticas. Se muestra el
+%                  tiempo de ejecución de cada algoritmo, así como la cantidad
+%                  de inferencias realizadas. Al final se despliega una tabla
+%                  con las longitudes de los caminos encontrados por cada
+%                  algoritmo.
+%       prueba_general.
 %
 % Heurística adicional: Guíada por el usuario.
 %    - Esta heurística permite al usuario definir la heurística a utilizar
@@ -312,3 +319,42 @@ prueba_uniform_cost:-
   estado_meta(EstadoMeta),
   busca_uniform_cost(EstadoInicial, EstadoMeta, Solución),
   format('Solución UniformCost: ~w~n', [Solución]).
+
+% prueba_general/0
+% Prueba de A*, Greedy y UniformCost, usando las dos heurísticas.
+% Se muestra el tiempo de ejecución de cada algoritmo, así como la cantidad
+% de inferencias realizadas.
+prueba_general:-
+  estado_inicial(EstadoInicial),
+  estado_meta(EstadoMeta),
+  % Distancia euclidiana.
+  retractall(heurística(_)),
+  assert(heurística(euclidiana)),
+  format('Distancia euclidiana~nA*:~n'),
+  time(busca_a_star(EstadoInicial, EstadoMeta, SoluciónAStarE)),
+  format('Greedy:~n'),
+  time(busca_greedy(EstadoInicial, EstadoMeta, SoluciónGreedyE)),
+  format('UniformCost:~n'),
+  time(busca_uniform_cost(EstadoInicial, EstadoMeta, SoluciónUniformCostE)),
+  % Distancia de manhattan.
+  retractall(heurística(_)),
+  assert(heurística(manhattan)),
+  format('Distancia de manhattan~nA*:~n'),
+  time(busca_a_star(EstadoInicial, EstadoMeta, SoluciónAStarM)),
+  format('Greedy:~n'),
+  time(busca_greedy(EstadoInicial, EstadoMeta, SoluciónGreedyM)),
+  format('UniformCost:~n'),
+  time(busca_uniform_cost(EstadoInicial, EstadoMeta, SoluciónUniformCostM)),
+  % Mostramos tabla con longitudes de los resultados.
+  format('Longitud de los caminos:~n'),
+  length(SoluciónAStarE, LongitudAStarE),
+  length(SoluciónAStarM, LongitudAStarM),
+  length(SoluciónGreedyE, LongitudGreedyE),
+  length(SoluciónGreedyM, LongitudGreedyM),
+  length(SoluciónUniformCostE, LongitudUniformCostE),
+  length(SoluciónUniformCostM, LongitudUniformCostM),
+  format('Algoritmo\t | Euclidiana\t | Manhattan~n'),
+  format('A*\t\t | ~w\t\t | ~w~n', [LongitudAStarE, LongitudAStarM]),
+  format('Greedy\t\t | ~w\t\t | ~w~n', [LongitudGreedyE, LongitudGreedyM]),
+  format('UniformCost\t | ~w\t\t | ~w~n', [LongitudUniformCostE, LongitudUniformCostM]).
+
