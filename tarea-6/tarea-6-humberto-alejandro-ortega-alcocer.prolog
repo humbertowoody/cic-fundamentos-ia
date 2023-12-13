@@ -181,16 +181,21 @@ turno_humano :-
 % pedir_jugada/2
 % pedir_jugada(-Renglón, -Columna)
 % Pide al usuario que ingrese su jugada.
-pedir_jugada(Renglón, Columna) :-
+pedir_jugada(RenglónLetra, Columna) :-
+    repeat,
     format('Ingresa tu jugada (renglón, columna): '),
-    read((Renglón, Columna)),
-    % Validar jugada
-    renglón(Renglón, RenglónNúmero),
-    between(1, 4, Columna),
-    estadoActual(Tablero, _),
-    símboloVacío(V),
-    nth1(RenglónNúmero, Tablero, Fila),
-    nth1(Columna, Fila, V).
+    read(UserInput),
+    (   UserInput = (RenglónLetra, Columna),
+        renglón(RenglónLetra, Renglón),
+        between(1, 4, Columna),
+        estadoActual(Tablero, _),
+        símboloVacío(V),
+        nth1(Renglón, Tablero, Fila),
+        nth1(Columna, Fila, Casilla),
+        Casilla = V
+    ->  !  % Si la jugada es válida, termina el bucle.
+    ;   format('Jugada inválida. Por favor intenta de nuevo.~n'), fail
+    ).
 
 % turno_agente/0
 % turno_agente
